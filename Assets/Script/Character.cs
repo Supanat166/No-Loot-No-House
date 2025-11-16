@@ -4,43 +4,71 @@ using System.Collections.Generic;
 
 public class Character : MonoBehaviour
 {
-    // (ตัวแปร Stats, Setup, Inventory ทั้งหมดเหมือนเดิม)
+    // === STATS ===
     [Header("Stats")]
     public float baseMovementSpeed = 5f;
     public int woodPlanks = 0;
 
+    // === SETUP ===
     [Header("Setup")]
-    public Transform weaponHolder; 
+    public Transform weaponHolder; // จุดหมุนปืน (ต้องลาก Empty Object ที่มือมาใส่)
     
+    // === INVENTORY ===
     [Header("Inventory")]
     public List<WeaponController> availableWeapons = new List<WeaponController>();
     public WeaponController currentWeapon;
+    public int potionCount = 0; // จำนวนยาที่เก็บได้
+    private PotionLootData storedPotionData; // "พิมพ์เขียว" (ข้อมูล) ของยาที่เก็บไว้
 
+    // === AUDIO ===
+    [Header("Audio Clips")]
+    public AudioClip shootSound;
+    public AudioClip potionSound;
+    public AudioClip repairSound;
+
+    // === Private Variables ===
+    private AudioSource audioSource; // "ลำโพง" ที่ติดตัวผู้เล่น
     private float currentMovementSpeed;
-    private GameObject currentInteractable; 
+    private GameObject currentInteractable; // ของที่อยู่ใกล้ๆ (กล่อง/บ้าน)
+
+    //==================================================================
+    //  UNITY FUNCTIONS (Start, Update)
+    //==================================================================
 
     void Start()
     {
         currentMovementSpeed = baseMovementSpeed;
+        
+        // ดึง "ลำโพง" มาเก็บไว้ (ต้อง Add Component "Audio Source" ที่ Player ก่อน)
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource != null)
+        {
+            audioSource.playOnAwake = false; // ปิดเล่นเสียงอัตโนมัติตอนเริ่ม
+        }
     }
 
     void Update()
     {
         Move();
-        HandleAiming();   // << ทำงานปกติ (แค่หมุนปืน)
-        HandleAttack();   // << ทำงานปกติ (เรียก Fire() ใหม่)
+        HandleAiming();   
+        HandleAttack();   
         HandleInteract(); 
+        HandleUsePotion(); // เช็คการกด R ใช้ยา
     }
+
+    //==================================================================
+    //  CORE MECHANICS (Movement, Aiming, Attack, Interact)
+    //==================================================================
 
     void Move()
     {
         float moveX = Input.GetAxis("Horizontal");
         float moveY = Input.GetAxis("Vertical");
+
         Vector2 movement = new Vector2(moveX, moveY).normalized;
         transform.Translate(movement * currentMovementSpeed * Time.deltaTime);
     }
 
-    // ฟังก์ชันนี้ "หมุนปืน" อย่างเดียว (ไม่เกี่ยวกับวิถีกระสุน)
     void HandleAiming()
     {
         if (currentWeapon != null)
@@ -50,6 +78,7 @@ public class Character : MonoBehaviour
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             weaponHolder.rotation = Quaternion.Euler(0, 0, angle);
 
+            // พลิกปืนไม่ให้กลับหัว
             SpriteRenderer weaponSprite = currentWeapon.GetComponent<SpriteRenderer>();
             if (weaponSprite != null)
             {
@@ -60,21 +89,24 @@ public class Character : MonoBehaviour
 
     void HandleAttack()
     {
-        // เรียก Fire() เวอร์ชันใหม่ (ที่ยิงกระสุนจริง)
         if (Input.GetButtonDown("Fire1") && currentWeapon != null)
         {
             bool shotFired = currentWeapon.Fire();
-            if (!shotFired)
+            if (shotFired)
+            {
+                // เล่นเสียงยิง
+                if (audioSource != null && shootSound != null)
+                {
+                    audioSource.PlayOneShot(shootSound);
+                }
+            }
+            else
             {
                 DestroyWeapon(currentWeapon);
             }
         }
     }
 
-    // (ฟังก์ชันอื่นๆ: HandleInteract, ReceiveItem, AddWeapon, DestroyWeapon, SpeedBoost, Triggers... เหมือนเดิมทั้งหมด)
-    
-    // ... (คัดลอกส่วนที่เหลือของ Character.cs มาวางต่อที่นี่) ...
-    // --- 4. การปฏิสัมพันธ์ (เก็บของ/ซ่อม) ---
     void HandleInteract()
     {
         if (Input.GetKeyDown(KeyCode.E) && currentInteractable != null)
@@ -89,13 +121,44 @@ public class Character : MonoBehaviour
                 {
                     woodPlanks--;
                     currentInteractable.GetComponent<Base>().Repair(20);
+                    
+                    // เล่นเสียงซ่อม
+                    if (audioSource != null && repairSound != null)
+                    {
+                        audioSource.PlayOneShot(repairSound);
+                    }
                     Debug.Log("ซ่อมบ้าน! ไม้เหลือ: " + woodPlanks);
                 }
             }
         }
     }
 
-    // --- ระบบรับไอเทม (ถูกเรียกจาก LootBox) ---
+    //==================================================================
+    //  ITEM & BUFF SYSTEM
+    //==================================================================
+
+    void HandleUsePotion()
+    {
+        if (Input.GetKeyDown(KeyCode.R) && potionCount > 0 && currentMovementSpeed <= baseMovementSpeed)
+        {
+            potionCount--; 
+            
+            // เล่นเสียงดื่มยา
+            if (audioSource != null && potionSound != null)
+            {
+                audioSource.PlayOneShot(potionSound);
+            }
+            
+            StartCoroutine(SpeedBoostCoroutine(storedPotionData.boostAmount, storedPotionData.duration));
+            Debug.Log("ใช้ยา! เหลือ: " + potionCount);
+
+            if (potionCount == 0)
+            {
+                storedPotionData = null;
+            }
+        }
+    }
+
     public void ReceiveItem(LootItemData item)
     {
         if (item is WeaponLootData)
@@ -106,7 +169,9 @@ public class Character : MonoBehaviour
         else if (item is PotionLootData)
         {
             PotionLootData data = (PotionLootData)item;
-            StartCoroutine(SpeedBoostCoroutine(data.boostAmount, data.duration));
+            storedPotionData = data; // เก็บ "พิมพ์เขียว" ยา
+            potionCount++;           // เพิ่ม "จำนวน" ยา
+            Debug.Log("เก็บยาได้! มีทั้งหมด: " + potionCount);
         }
         else if (item is PlankLootData)
         {
@@ -116,7 +181,19 @@ public class Character : MonoBehaviour
         }
     }
 
-    // --- ระบบจัดการปืน ---
+    IEnumerator SpeedBoostCoroutine(float boost, float duration)
+    {
+        currentMovementSpeed += boost;
+        Debug.Log("วิ่งเร็วขึ้น!");
+        yield return new WaitForSeconds(duration);
+        currentMovementSpeed = baseMovementSpeed;
+        Debug.Log("ความเร็วปกติ");
+    }
+
+    //==================================================================
+    //  WEAPON MANAGEMENT
+    //==================================================================
+
     public void AddWeapon(GameObject weaponPrefab, int startingAmmo)
     {
         if (currentWeapon != null)
@@ -141,20 +218,13 @@ public class Character : MonoBehaviour
         availableWeapons.Remove(weapon);
         Destroy(weapon.gameObject);
         currentWeapon = null;
-        Debug.Log("ปืนพัง! (กระสุนหมด)");
+        Debug.Log("ปืนพัง! (กระSunหมด)");
     }
 
-    // --- ระบบยาเพิ่มความเร็ว ---
-    IEnumerator SpeedBoostCoroutine(float boost, float duration)
-    {
-        currentMovementSpeed += boost;
-        Debug.Log("วิ่งเร็วขึ้น!");
-        yield return new WaitForSeconds(duration);
-        currentMovementSpeed = baseMovementSpeed;
-        Debug.Log("ความเร็วปกติ");
-    }
+    //==================================================================
+    //  PHYSICS TRIGGERS
+    //==================================================================
 
-    // --- ตรวจจับการชน (Trigger) ---
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("LootBox") || other.CompareTag("Base"))

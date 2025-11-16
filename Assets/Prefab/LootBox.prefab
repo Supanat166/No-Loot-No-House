@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 4216037618753974698}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.64429, y: -1.2166356, z: 0}
+  m_LocalPosition: {x: -2.1628046, y: -2.5867217, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47690184677916d46a94d0b9e723a440, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootBox
+  openSound: {fileID: 8300000, guid: 0b5b35b3216b3444198670457be9f46d, type: 3}
   possibleLoot:
   - {fileID: 11400000, guid: ce201d0f138f03946b4011f9bbe01df2, type: 2}
   - {fileID: 11400000, guid: b04ca0f56e9b77e43b93d59f11c0683c, type: 2}
