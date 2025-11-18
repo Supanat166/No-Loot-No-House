@@ -4,8 +4,9 @@ public class Monster : MonoBehaviour
 {
     // [เพิ่ม 1] สร้างช่องสำหรับลาก Prefab เอฟเฟคควันมาใส่
     public GameObject deathEffectPrefab; 
-
+    public HealthBarUI healthBarUI;
     public float health = 100f;
+    private float maxhealth = 0f;
     public int damage = 15;
     public float moveSpeed = 1.5f;
     
@@ -17,6 +18,9 @@ public class Monster : MonoBehaviour
 
     void Start()
     {
+        maxhealth = health;
+        healthBarUI.slider.maxValue=maxhealth;
+        healthBarUI.slider.value=health;
         targetBase = FindObjectOfType<Base>();
         rb = GetComponent<Rigidbody2D>();
         monstersAlive++;
@@ -53,6 +57,7 @@ public class Monster : MonoBehaviour
     public void TakeDamage(float amount)
     {
         health -= amount;
+        healthBarUI.slider.value=health;
         if (health <= 0)
         {
             Die(); // เรียกฟังก์ชันตาย

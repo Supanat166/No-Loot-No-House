@@ -4,11 +4,13 @@ public class Base : MonoBehaviour
 {
     public int maxHealth = 300;
     public int currentHealth;
-
+    public HealthBarUI healthBarUI;
     void Start()
     {
         currentHealth = maxHealth;
         // [TODO] อัปเดต UI หลอดเลือดบ้าน
+        healthBarUI.slider.maxValue=maxHealth;
+        healthBarUI.slider.value=currentHealth;
     }
 
     public void TakeDamage(int amount)
@@ -16,7 +18,8 @@ public class Base : MonoBehaviour
         currentHealth -= amount;
         if (currentHealth < 0) currentHealth = 0;
         
-        // [TODO] อัปเดต UI หลอดเลือดบ้าน
+        // [TODO] อัปเดต UI หลอดเลือดบ้าน 
+        healthBarUI.slider.value=currentHealth;
         Debug.Log("Base HP: " + currentHealth);
 
         if (currentHealth <= 0)
