@@ -1,6 +1,7 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WaveManager : MonoBehaviour
 {
@@ -67,7 +68,9 @@ public class WaveManager : MonoBehaviour
         Debug.Log("สุดยอด! คุณรอดพ้นทั้ง 5 เวฟแล้ว! (YOU WIN)");
         
         // นี่คือคำสั่ง "หยุดเกม" ครับ
-        Time.timeScale = 0f; 
+        Time.timeScale = 0f;
         // -----------------
+        SceneManager.LoadScene("YouWin");
+
     }
 }
