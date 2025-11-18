@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class Base : MonoBehaviour
 {
     public int maxHealth = 300;
@@ -39,5 +39,6 @@ public class Base : MonoBehaviour
         Debug.Log("GAME OVER - บ้านพัง!");
         // [TODO] แสดงหน้าจอ Game Over
         Time.timeScale = 0f; // หยุดเกม
+        SceneManager.LoadScene("Gameover");
     }
 }
