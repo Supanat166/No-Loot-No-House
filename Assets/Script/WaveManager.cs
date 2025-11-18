@@ -6,7 +6,7 @@ public class WaveManager : MonoBehaviour
 {
     public GameObject monsterPrefab;
     public List<Transform> spawnPoints; 
-
+    public UpdateText waveText;
     public int waveNumber = 1;
     public int enemiesPerWave = 5;
     public float timeBetweenWaves = 10f; 
@@ -24,7 +24,7 @@ public class WaveManager : MonoBehaviour
         while (waveNumber <= 5)
         {
             Debug.Log("Wave " + waveNumber + " เริ่ม!");
-
+            waveText.setup("Wave " + waveNumber);
             // (ส่วนสร้างซอมบี้ - เหมือนเดิม)
             for (int i = 0; i < enemiesPerWave; i++)
             {
