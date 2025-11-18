@@ -27351,7 +27351,7 @@ MonoBehaviour:
   - {fileID: 1411809078}
   - {fileID: 1627603935}
   - {fileID: 408261838}
-  waveText: {fileID: 0}
+  waveText: {fileID: 1886620312}
   waveNumber: 1
   enemiesPerWave: 5
   timeBetweenWaves: 15
@@ -28936,6 +28936,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 624066252}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1886620312 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7297900737084847698, guid: ce88306754247de4faa374353d58e322, type: 3}
+  m_PrefabInstance: {fileID: 44372797}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bab4bf67c76ff84e8e66bb3c5752387, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpdateText
 --- !u!1 &1900180309
 GameObject:
   m_ObjectHideFlags: 0
