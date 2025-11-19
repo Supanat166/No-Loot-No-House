@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: PotionData
   m_EditorClassIdentifier: Assembly-CSharp::PotionLootData
   type: 0
+  displayName: Potion
+  icon: {fileID: 0}
   boostAmount: 3
   duration: 10

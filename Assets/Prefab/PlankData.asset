@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: PlankData
   m_EditorClassIdentifier: Assembly-CSharp::PlankLootData
   type: 0
+  displayName: Wood
+  icon: {fileID: 0}
   amount: 5

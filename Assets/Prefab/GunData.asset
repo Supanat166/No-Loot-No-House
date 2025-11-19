@@ -13,5 +13,7 @@ MonoBehaviour:
   m_Name: GunData
   m_EditorClassIdentifier: Assembly-CSharp::WeaponLootData
   type: 0
+  displayName: Gun
+  icon: {fileID: 0}
   weaponPrefab: {fileID: 4659071543345841729, guid: 1be207c3c8f39714c8940267135a54d6, type: 3}
   startingAmmo: 30
