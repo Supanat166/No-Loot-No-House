@@ -70,4 +70,3 @@ public class LootUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 }
-

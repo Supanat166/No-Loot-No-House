@@ -8,17 +8,18 @@ public class Character : MonoBehaviour
     [Header("Stats")]
     public float baseMovementSpeed = 5f;
     public int woodPlanks = 0;
+    public int woodCostPerRepair = 5;   // ใช้ไม้กี่แผ่นต่อการซ่อม 1 ครั้ง
 
     // === SETUP ===
     [Header("Setup")]
     public Transform weaponHolder; // จุดหมุนปืน (ต้องลาก Empty Object ที่มือมาใส่)
-    
+
     // === INVENTORY ===
     [Header("Inventory")]
     public List<WeaponController> availableWeapons = new List<WeaponController>();
     public WeaponController currentWeapon;
     public int potionCount = 0; // จำนวนยาที่เก็บได้
-    private PotionLootData storedPotionData; // "พิมพ์เขียว" (ข้อมูล) ของยาที่เก็บไว้
+    private PotionLootData storedPotionData; // "พิมพ์เขียว" ยาที่เก็บไว้ (เอาไว้รู้ค่า boost/duration)
 
     // === AUDIO ===
     [Header("Audio Clips")]
@@ -38,7 +39,7 @@ public class Character : MonoBehaviour
     void Start()
     {
         currentMovementSpeed = baseMovementSpeed;
-        
+
         // ดึง "ลำโพง" มาเก็บไว้ (ต้อง Add Component "Audio Source" ที่ Player ก่อน)
         audioSource = GetComponent<AudioSource>();
         if (audioSource != null)
@@ -50,9 +51,9 @@ public class Character : MonoBehaviour
     void Update()
     {
         Move();
-        HandleAiming();   
-        HandleAttack();   
-        HandleInteract(); 
+        HandleAiming();
+        HandleAttack();
+        HandleInteract();
         HandleUsePotion(); // เช็คการกด R ใช้ยา
     }
 
@@ -71,7 +72,7 @@ public class Character : MonoBehaviour
 
     void HandleAiming()
     {
-        if (currentWeapon != null)
+        if (currentWeapon != null && weaponHolder != null)
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 direction = mousePos - weaponHolder.position;
@@ -102,6 +103,8 @@ public class Character : MonoBehaviour
             }
             else
             {
+                // กระสุนหมดหรือยิงไม่ได้
+                Debug.Log("ยิงไม่ได้: กระสุนหมดหรือปืนพัง");
                 DestroyWeapon(currentWeapon);
             }
         }
@@ -113,21 +116,32 @@ public class Character : MonoBehaviour
         {
             if (currentInteractable.CompareTag("LootBox"))
             {
-                currentInteractable.GetComponent<LootBox>().Open(this);
+                LootBox box = currentInteractable.GetComponent<LootBox>();
+                if (box != null)
+                    box.Open(this);
             }
             else if (currentInteractable.CompareTag("Base"))
             {
-                if (woodPlanks > 0)
+                Base baseObj = currentInteractable.GetComponent<Base>();
+                if (baseObj != null)
                 {
-                    woodPlanks--;
-                    currentInteractable.GetComponent<Base>().Repair(20);
-                    
-                    // เล่นเสียงซ่อม
-                    if (audioSource != null && repairSound != null)
+                    if (woodPlanks >= woodCostPerRepair)
                     {
-                        audioSource.PlayOneShot(repairSound);
+                        woodPlanks -= woodCostPerRepair;
+                        baseObj.Repair(20);
+
+                        // เล่นเสียงซ่อม
+                        if (audioSource != null && repairSound != null)
+                        {
+                            audioSource.PlayOneShot(repairSound);
+                        }
+
+                        Debug.Log($"ซ่อมบ้าน! ใช้ไม้ {woodCostPerRepair} ชิ้น เหลือ: {woodPlanks}");
                     }
-                    Debug.Log("ซ่อมบ้าน! ไม้เหลือ: " + woodPlanks);
+                    else
+                    {
+                        Debug.Log($"ไม้ไม่พอซ่อมบ้าน! ต้องใช้ {woodCostPerRepair} แต่มี {woodPlanks}");
+                    }
                 }
             }
         }
@@ -141,15 +155,23 @@ public class Character : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R) && potionCount > 0 && currentMovementSpeed <= baseMovementSpeed)
         {
-            potionCount--; 
-            
+            potionCount--;
+
             // เล่นเสียงดื่มยา
             if (audioSource != null && potionSound != null)
             {
                 audioSource.PlayOneShot(potionSound);
             }
-            
-            StartCoroutine(SpeedBoostCoroutine(storedPotionData.boostAmount, storedPotionData.duration));
+
+            if (storedPotionData != null)
+            {
+                StartCoroutine(SpeedBoostCoroutine(storedPotionData.boostAmount, storedPotionData.duration));
+            }
+            else
+            {
+                Debug.LogWarning("กดใช้ยา แต่ storedPotionData เป็น null");
+            }
+
             Debug.Log("ใช้ยา! เหลือ: " + potionCount);
 
             if (potionCount == 0)
@@ -159,35 +181,77 @@ public class Character : MonoBehaviour
         }
     }
 
+    // ฟังก์ชันนี้ถูกเรียกจาก LootBox.Open(this);
     public void ReceiveItem(LootItemData item)
     {
-        if (item is WeaponLootData)
+        if (item == null)
         {
-            WeaponLootData data = (WeaponLootData)item;
-            AddWeapon(data.weaponPrefab, data.startingAmmo);
+            Debug.LogWarning("ReceiveItem ถูกเรียกด้วย item = null");
+            return;
         }
-        else if (item is PotionLootData)
+
+        // 1) ได้ปืน
+        WeaponLootData weaponLoot = item as WeaponLootData;
+        if (weaponLoot != null)
         {
-            PotionLootData data = (PotionLootData)item;
-            storedPotionData = data; // เก็บ "พิมพ์เขียว" ยา
-            potionCount++;           // เพิ่ม "จำนวน" ยา
-            Debug.Log("เก็บยาได้! มีทั้งหมด: " + potionCount);
+            // กำหนดกระสุนที่จะได้จากกล่องนี้ (เช่น 30 นัด)
+            int ammoToAdd = weaponLoot.startingAmmo;
+
+            // เช็คว่าเราถือปืนอยู่แล้วหรือเปล่า?
+            if (currentWeapon != null)
+            {
+                // ถ้ามีปืนอยู่แล้ว ให้เอากระสุนที่เหลืออยู่ มารวกกับของใหม่
+                // เช่น เหลือ 28 + เก็บได้ 30 = ส่งค่า 58 ไปสร้างปืนใหม่
+                ammoToAdd += currentWeapon.currentAmmo;
+            }
+
+            // ส่งยอดรวม (ammoToAdd) ไปที่ฟังก์ชัน AddWeapon
+            AddWeapon(weaponLoot.weaponPrefab, ammoToAdd);
+
+            Debug.Log($"ได้ปืนเพิ่ม! กระสุนใหม่ + ของเก่า รวมเป็น: {ammoToAdd}");
+
+    
+          
+            return;
         }
-        else if (item is PlankLootData)
+
+
+
+
+
+
+
+
+
+        // 2) ได้ Potion
+        PotionLootData potionLoot = item as PotionLootData;
+        if (potionLoot != null)
         {
-            PlankLootData data = (PlankLootData)item;
-            woodPlanks += data.amount;
-            Debug.Log("ได้ไม้เพิ่ม! รวม: " + woodPlanks);
+            storedPotionData = potionLoot;
+            potionCount++;   // ถ้า PotionLootData ไม่มี amount ก็เพิ่มทีละ 1
+            Debug.Log($"ได้ยา! ตอนนี้มียารวม: {potionCount}");
+            return;
         }
+
+        // 3) ได้ไม้
+        PlankLootData plankLoot = item as PlankLootData;
+        if (plankLoot != null)
+        {
+            woodPlanks += plankLoot.amount;   // ใช้ field amount ตามโค้ดเดิมของคุณ
+            Debug.Log($"ได้ไม้ +{plankLoot.amount} แผ่น รวม: {woodPlanks}");
+            return;
+        }
+
+        Debug.LogWarning("ReceiveItem: ยังไม่ได้รองรับไอเท็มชนิดนี้ -> " + item.name);
     }
 
     IEnumerator SpeedBoostCoroutine(float boost, float duration)
     {
         currentMovementSpeed += boost;
-        Debug.Log("วิ่งเร็วขึ้น!");
+        Debug.Log("วิ่งเร็วขึ้น! +" + boost);
         yield return new WaitForSeconds(duration);
         currentMovementSpeed = baseMovementSpeed;
-        Debug.Log("ความเร็วปกติ");
+        Debug.Log("ความเร็วกลับสู่ปกติ");
     }
 
     //==================================================================
@@ -196,6 +260,12 @@ public class Character : MonoBehaviour
 
     public void AddWeapon(GameObject weaponPrefab, int startingAmmo)
     {
+        if (weaponPrefab == null)
+        {
+            Debug.LogWarning("AddWeapon ถูกเรียก แต่ weaponPrefab = null");
+            return;
+        }
+
         if (currentWeapon != null)
         {
             Destroy(currentWeapon.gameObject);
@@ -203,22 +273,29 @@ public class Character : MonoBehaviour
         }
 
         GameObject newWeaponObj = Instantiate(weaponPrefab, weaponHolder.position, weaponHolder.rotation);
-        newWeaponObj.transform.SetParent(weaponHolder); 
-        newWeaponObj.transform.localPosition = Vector3.zero; 
+        newWeaponObj.transform.SetParent(weaponHolder);
+        newWeaponObj.transform.localPosition = Vector3.zero;
 
         WeaponController newWeapon = newWeaponObj.GetComponent<WeaponController>();
-        newWeapon.currentAmmo = startingAmmo;
+        if (newWeapon == null)
+        {
+            Debug.LogError("WeaponPrefab ไม่มี Component WeaponController");
+            return;
+        }
 
+        newWeapon.currentAmmo = startingAmmo;
         availableWeapons.Add(newWeapon);
         currentWeapon = newWeapon;
     }
 
     public void DestroyWeapon(WeaponController weapon)
     {
+        if (weapon == null) return;
+
         availableWeapons.Remove(weapon);
         Destroy(weapon.gameObject);
         currentWeapon = null;
-        Debug.Log("ปืนพัง! (กระSunหมด)");
+        Debug.Log("ปืนพัง! (หรือกระสุนหมดแล้วลบทิ้ง)");
     }
 
     //==================================================================
@@ -241,3 +318,5 @@ public class Character : MonoBehaviour
         }
     }
 }
+
+
