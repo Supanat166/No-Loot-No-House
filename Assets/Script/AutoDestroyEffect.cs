@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class AutoDestroyEffect : MonoBehaviour
 {
+    
     public float lifeTime = 2f;
 
     void Start()
