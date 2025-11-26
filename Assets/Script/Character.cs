@@ -6,8 +6,8 @@ public class Character : MonoBehaviour
 {
     // === STATS ===
     [Header("Stats")]
-    public float baseMovementSpeed = 5f;
-    public int woodPlanks = 0;
+    public float baseMovementSpeed = 5f; //ความเร็วเริ่มต้นของผู้เล่น
+    public int woodPlanks = 0;           //จำนวนไม้
     public int woodCostPerRepair = 5;   // ใช้ไม้กี่แผ่นต่อการซ่อม 1 ครั้ง
 
     // === SETUP ===
