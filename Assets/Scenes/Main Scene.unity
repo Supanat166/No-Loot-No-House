@@ -29171,7 +29171,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '''E'' When nearby house
+  m_text: '''E'' When nearby house to repair
 
     ''R'' to use SpeedPotion'
   m_isRightToLeft: 0
