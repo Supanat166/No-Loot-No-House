@@ -135,6 +135,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbf6321d12a1f394fa7674e0e9d78617, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponController
-  currentAmmo: 0
   firePoint: {fileID: 7447338181526256425}
   bulletPrefab: {fileID: 3054877584531559424, guid: 7f2d23d89c6fe5a4d9dbebfb30eb1622, type: 3}

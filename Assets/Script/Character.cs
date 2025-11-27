@@ -9,14 +9,14 @@ public class Character : MonoBehaviour
     public float baseMovementSpeed = 5f; //ความเร็วเริ่มต้นของผู้เล่น
     public int woodPlanks = 0;           //จำนวนไม้
     public int woodCostPerRepair = 5;   // ใช้ไม้กี่แผ่นต่อการซ่อม 1 ครั้ง
-
+    public int totalAmmo = 0;
+    
     // === SETUP ===
     [Header("Setup")]
     public Transform weaponHolder; // จุดหมุนปืน (ต้องลาก Empty Object ที่มือมาใส่)
 
     // === INVENTORY ===
     [Header("Inventory")]
-    public List<WeaponController> availableWeapons = new List<WeaponController>();
     public WeaponController currentWeapon;
     public int potionCount = 0; // จำนวนยาที่เก็บได้
     private PotionLootData storedPotionData; // "พิมพ์เขียว" ยาที่เก็บไว้ (เอาไว้รู้ค่า boost/duration)
@@ -92,9 +92,13 @@ public class Character : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1") && currentWeapon != null)
         {
-            bool shotFired = currentWeapon.Fire();
-            if (shotFired)
+            // เรียก Fire() โดยส่ง totalAmmo เข้าไป
+            int ammoUsed = currentWeapon.Fire(totalAmmo);
+
+            if (ammoUsed > 0)
             {
+                totalAmmo -= ammoUsed; // ลดกระสุนตามจำนวนที่ยิงได้
+
                 // เล่นเสียงยิง
                 if (audioSource != null && shootSound != null)
                 {
@@ -103,8 +107,8 @@ public class Character : MonoBehaviour
             }
             else
             {
-                // กระสุนหมดหรือยิงไม่ได้
-                Debug.Log("ยิงไม่ได้: กระสุนหมดหรือปืนพัง");
+                // กระสุนหมด
+                Debug.Log("ยิงไม่ได้: กระสุนหมด");
                 DestroyWeapon(currentWeapon);
             }
         }
@@ -194,34 +198,17 @@ public class Character : MonoBehaviour
         WeaponLootData weaponLoot = item as WeaponLootData;
         if (weaponLoot != null)
         {
-            // กำหนดกระสุนที่จะได้จากกล่องนี้ (เช่น 30 นัด)
-            int ammoToAdd = weaponLoot.startingAmmo;
+            // เพิ่มกระสุนให้กับ totalAmmo โดยตรง
+            totalAmmo += weaponLoot.startingAmmo;
 
-            // เช็คว่าเราถือปืนอยู่แล้วหรือเปล่า?
-            if (currentWeapon != null)
-            {
-                // ถ้ามีปืนอยู่แล้ว ให้เอากระสุนที่เหลืออยู่ มารวกกับของใหม่
-                // เช่น เหลือ 28 + เก็บได้ 30 = ส่งค่า 58 ไปสร้างปืนใหม่
-                ammoToAdd += currentWeapon.currentAmmo;
-            }
+            // เปลี่ยนปืนใหม่
+            AddWeapon(weaponLoot.weaponPrefab); // เรียก AddWeapon เวอร์ชั่นที่ไม่มี startingAmmo
 
-            // ส่งยอดรวม (ammoToAdd) ไปที่ฟังก์ชัน AddWeapon
-            AddWeapon(weaponLoot.weaponPrefab, ammoToAdd);
+            Debug.Log($"ได้ปืนใหม่! เพิ่มกระสุน +{weaponLoot.startingAmmo} นัด, กระสุนรวม: {totalAmmo}");
 
-            Debug.Log($"ได้ปืนเพิ่ม! กระสุนใหม่ + ของเก่า รวมเป็น: {ammoToAdd}");
-
-    
-          
             return;
+        
         }
-
-
-
-
-
-
-
-
 
         // 2) ได้ Potion
         PotionLootData potionLoot = item as PotionLootData;
@@ -258,7 +245,7 @@ public class Character : MonoBehaviour
     //  WEAPON MANAGEMENT
     //==================================================================
 
-    public void AddWeapon(GameObject weaponPrefab, int startingAmmo)
+    public void AddWeapon(GameObject weaponPrefab) // 🎯 ไม่รับ startingAmmo แล้ว
     {
         if (weaponPrefab == null)
         {
@@ -268,8 +255,9 @@ public class Character : MonoBehaviour
 
         if (currentWeapon != null)
         {
+            // ทำลายปืนเก่า
             Destroy(currentWeapon.gameObject);
-            availableWeapons.Clear();
+            // availableWeapons.Clear(); ลบออก
         }
 
         GameObject newWeaponObj = Instantiate(weaponPrefab, weaponHolder.position, weaponHolder.rotation);
@@ -283,8 +271,7 @@ public class Character : MonoBehaviour
             return;
         }
 
-        newWeapon.currentAmmo = startingAmmo;
-        availableWeapons.Add(newWeapon);
+        
         currentWeapon = newWeapon;
     }
 
@@ -292,10 +279,10 @@ public class Character : MonoBehaviour
     {
         if (weapon == null) return;
 
-        availableWeapons.Remove(weapon);
+        // availableWeapons.Remove(weapon); ลบออก
         Destroy(weapon.gameObject);
         currentWeapon = null;
-        Debug.Log("ปืนพัง! (หรือกระสุนหมดแล้วลบทิ้ง)");
+        Debug.Log("ปืนถูกทำลาย/เปลี่ยน");
     }
 
     //==================================================================

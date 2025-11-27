@@ -3,17 +3,20 @@ using UnityEngine;
 public class WeaponController : MonoBehaviour
 {
     [Header("Settings")]
-    public int currentAmmo;     
-    public Transform firePoint; 
+    // ลบ public int currentAmmo; ออก
+    public Transform firePoint;
 
     [Header("Bullet")]
-    public GameObject bulletPrefab; 
-    
-    public bool Fire()
+    public GameObject bulletPrefab;
+
+    // เปลี่ยน Fire() ให้รับ currentAmmo และส่งคืนกระสุนที่ใช้ไป
+    // int currentAmmo: กระสุนปัจจุบัน
+    // return int: จำนวนกระสุนที่ถูกใช้ไป (1 ถ้ามีการยิง, 0 ถ้าไม่มีการยิง)
+    public int Fire(int currentAmmo)
     {
         if (currentAmmo > 0)
         {
-            currentAmmo--;
+            // ไม่ต้องลดกระสุนที่นี่แล้ว
 
             // 1. หาตำแหน่งเมาส์
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -28,11 +31,11 @@ public class WeaponController : MonoBehaviour
             // 4. บอกกระสุนว่าให้พุ่งไปทางไหน
             bullet.GetComponent<Bullet>().SetDirection(shootDirection);
 
-            return true; 
+            return 1; // ยิงสำเร็จ, ใช้กระสุนไป 1 นัด
         }
         else
         {
-            return false; 
+            return 0; // ยิงไม่สำเร็จ, ใช้กระสุนไป 0 นัด
         }
     }
 }
