@@ -11,7 +11,7 @@ public class ResourceUI : MonoBehaviour
 
     void Start()
     {
-        // �� Character ����á㹩ҡ
+        
         player = FindObjectOfType<Character>();
 
     }

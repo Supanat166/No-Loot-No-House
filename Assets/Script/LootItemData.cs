@@ -10,6 +10,6 @@ public enum ItemType
 public class LootItemData : ScriptableObject
 {
     public ItemType type;
-    public string displayName;   // ใช้ตัวนี้ใน UI พึ่งแอดไป
-    public Sprite icon; // พี่งแอดไป
+    public string displayName;   
+    public Sprite icon; 
 }

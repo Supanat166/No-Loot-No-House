@@ -26,7 +26,7 @@ public class WaveManager : MonoBehaviour
         {
             Debug.Log("Wave " + waveNumber + " เริ่ม!");
             waveText.setup("Wave " + waveNumber);
-            // (ส่วนสร้างซอมบี้ - เหมือนเดิม)
+            
             for (int i = 0; i < enemiesPerWave; i++)
             {
                 if (spawnPoints.Count > 0)
@@ -39,8 +39,8 @@ public class WaveManager : MonoBehaviour
             }
 
             // --- [แก้ใหม่] ---
-            // รอจนกว่าซอมบี้จะตายหมด (เหลือ 0)
-            Debug.Log("Wave " + waveNumber + " รอเคลียร์ซอมบี้...");
+            // รอจนกว่ามอนจะตายหมด (เหลือ 0)
+            Debug.Log("Wave " + waveNumber + " รอเคลียรมอน...");
             while (Monster.monstersAlive > 0)
             {
                 yield return null; // "รอเฟรมถัดไป" แล้วเช็คใหม่
@@ -63,11 +63,9 @@ public class WaveManager : MonoBehaviour
             enemiesPerWave += 3;
         }
 
-        // --- [แก้ใหม่] ---
-        // (โค้ดนี้จะทำงาน "หลังจาก" เคลียร์เวฟ 5 (ซอมบี้ = 0) แล้ว)
-        Debug.Log("สุดยอด! คุณรอดพ้นทั้ง 5 เวฟแล้ว! (YOU WIN)");
         
-        // นี่คือคำสั่ง "หยุดเกม" ครับ
+        Debug.Log("YOU WIN");
+        
         Time.timeScale = 0f;
         // -----------------
         SceneManager.LoadScene("YouWin");

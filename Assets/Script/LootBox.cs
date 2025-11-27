@@ -32,7 +32,7 @@ public class LootBox : MonoBehaviour
 
         // 3. ทำลายกล่องทิ้ง (หลังจากเล่นเสียงและให้ของแล้ว)
         Destroy(gameObject);
-        if (LootUI.Instance != null) //พึ่งแอดไป
+        if (LootUI.Instance != null) 
         {
             LootUI.Instance.ShowLoot(itemToGive);
         }

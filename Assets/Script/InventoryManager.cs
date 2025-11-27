@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro; // สำคัญ: ต้องใช้ namespace นี้สำหรับ TextMeshPro
+using TMPro; // ๏ฟฝำคัญ: ๏ฟฝ๏ฟฝอง๏ฟฝ๏ฟฝ namespace ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝ๏ฟฝับ TextMeshPro
 using System.Collections.Generic;
 
 public class InventoryManager : MonoBehaviour
@@ -7,13 +7,12 @@ public class InventoryManager : MonoBehaviour
     // Singleton Pattern 
     public static InventoryManager Instance;
 
-    // --- เปลี่ยนชนิดตัวแปรเป็น TextMeshProUGUI ---
-    // การอ้างอิงไปยัง Text Component ใน Unity UI (TMP)
+    
     public TextMeshProUGUI woodCountText;
     public TextMeshProUGUI potionCountText;
     public TextMeshProUGUI gunCountText;
 
-    // Dictionary เพื่อเก็บชื่อไอเท็มและจำนวนที่เก็บได้
+    
     private Dictionary<string, int> items = new Dictionary<string, int>();
 
     void Awake()
@@ -27,7 +26,7 @@ public class InventoryManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        // กำหนดค่าเริ่มต้น
+        
         items.Add("Wood", 0);
         items.Add("Potion", 0);
         items.Add("Gun", 0);
@@ -35,7 +34,7 @@ public class InventoryManager : MonoBehaviour
         UpdateAllUI();
     }
 
-    // ฟังก์ชันสำหรับเพิ่มไอเท็ม (เหมือนเดิม)
+    
     public void AddItem(string itemName, int amount)
     {
         if (items.ContainsKey(itemName))
@@ -45,15 +44,15 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    // ฟังก์ชันสำหรับอัปเดต UI ของไอเท็มที่กำหนด
+    
     private void UpdateUI(string itemName)
     {
-        // อัปเดต Text Component ที่เกี่ยวข้อง
+        
         switch (itemName)
         {
             case "Wood":
                 if (woodCountText != null)
-                    // ใช้ .text ในการอัปเดตข้อความ
+                    
                     woodCountText.text = $"Wood: {items["Wood"]}";
                 break;
             case "Potion":

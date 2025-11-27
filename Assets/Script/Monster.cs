@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
-    // [เพิ่ม 1] สร้างช่องสำหรับลาก Prefab เอฟเฟคควันมาใส่
     public GameObject deathEffectPrefab; 
     public HealthBarUI healthBarUI;
     public float health = 100f;
@@ -11,7 +10,7 @@ public class Monster : MonoBehaviour
     public float moveSpeed = 1.5f;
     
     [Header("Audio")]
-    public AudioClip deathSound; // (โค้ดเดิมของคุณมีอยู่แล้ว)
+    public AudioClip deathSound; 
     
     private Base targetBase;
     private Rigidbody2D rb;
@@ -88,8 +87,7 @@ public class Monster : MonoBehaviour
         // 4. ทำลายตัวเอง
         Destroy(gameObject);
     }
-    // ----------------
 
-    // (ตัวนับ static monstersAlive ของคุณ)
+    
     public static int monstersAlive = 0; 
 }

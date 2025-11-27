@@ -8,15 +8,15 @@ public class LootUI : MonoBehaviour
     public static LootUI Instance;
 
     [Header("UI")]
-    public TMP_Text lootText;     // ข้อความ "You got: xxx"
-    public Image lootIcon;        // รูปไอเท็ม (ไม่ใช้ก็ปล่อยว่างได้)
-    public float showTime = 2f;   // แสดงกี่วินาทีแล้วค่อยหาย
+    public TMP_Text lootText;     
+    public Image lootIcon;        
+    public float showTime = 2f;   
 
     private Coroutine showRoutine;
 
     private void Awake()
     {
-        // ทำเป็น Singleton แบบง่าย ๆ
+        
         if (Instance == null)
         {
             Instance = this;
@@ -27,7 +27,7 @@ public class LootUI : MonoBehaviour
             return;
         }
 
-        gameObject.SetActive(false); // เริ่มเกมซ่อนไว้ก่อน
+        gameObject.SetActive(false); 
     }
 
     public void ShowLoot(LootItemData item)
@@ -36,13 +36,13 @@ public class LootUI : MonoBehaviour
 
         gameObject.SetActive(true);
 
-        // ข้อความ
+        
         if (lootText != null)
         {
             lootText.text = "You got: " + item.displayName;
         }
 
-        // ไอคอน
+        
         if (lootIcon != null)
         {
             if (item.icon != null)
@@ -56,7 +56,7 @@ public class LootUI : MonoBehaviour
             }
         }
 
-        // ถ้าเคยมี coroutine เก่าอยู่ ให้หยุดก่อน
+        
         if (showRoutine != null)
         {
             StopCoroutine(showRoutine);

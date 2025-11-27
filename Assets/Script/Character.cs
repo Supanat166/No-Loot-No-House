@@ -202,7 +202,7 @@ public class Character : MonoBehaviour
             totalAmmo += weaponLoot.startingAmmo;
 
             // เปลี่ยนปืนใหม่
-            AddWeapon(weaponLoot.weaponPrefab); // เรียก AddWeapon เวอร์ชั่นที่ไม่มี startingAmmo
+            AddWeapon(weaponLoot.weaponPrefab); 
 
             Debug.Log($"ได้ปืนใหม่! เพิ่มกระสุน +{weaponLoot.startingAmmo} นัด, กระสุนรวม: {totalAmmo}");
 
@@ -224,7 +224,7 @@ public class Character : MonoBehaviour
         PlankLootData plankLoot = item as PlankLootData;
         if (plankLoot != null)
         {
-            woodPlanks += plankLoot.amount;   // ใช้ field amount ตามโค้ดเดิมของคุณ
+            woodPlanks += plankLoot.amount;   
             Debug.Log($"ได้ไม้ +{plankLoot.amount} แผ่น รวม: {woodPlanks}");
             return;
         }
@@ -245,7 +245,7 @@ public class Character : MonoBehaviour
     //  WEAPON MANAGEMENT
     //==================================================================
 
-    public void AddWeapon(GameObject weaponPrefab) // 🎯 ไม่รับ startingAmmo แล้ว
+    public void AddWeapon(GameObject weaponPrefab) 
     {
         if (weaponPrefab == null)
         {
@@ -257,7 +257,7 @@ public class Character : MonoBehaviour
         {
             // ทำลายปืนเก่า
             Destroy(currentWeapon.gameObject);
-            // availableWeapons.Clear(); ลบออก
+            
         }
 
         GameObject newWeaponObj = Instantiate(weaponPrefab, weaponHolder.position, weaponHolder.rotation);
@@ -279,7 +279,7 @@ public class Character : MonoBehaviour
     {
         if (weapon == null) return;
 
-        // availableWeapons.Remove(weapon); ลบออก
+        
         Destroy(weapon.gameObject);
         currentWeapon = null;
         Debug.Log("ปืนถูกทำลาย/เปลี่ยน");

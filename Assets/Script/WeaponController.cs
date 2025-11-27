@@ -3,7 +3,6 @@ using UnityEngine;
 public class WeaponController : MonoBehaviour
 {
     [Header("Settings")]
-    // ลบ public int currentAmmo; ออก
     public Transform firePoint;
 
     [Header("Bullet")]
@@ -16,7 +15,6 @@ public class WeaponController : MonoBehaviour
     {
         if (currentAmmo > 0)
         {
-            // ไม่ต้องลดกระสุนที่นี่แล้ว
 
             // 1. หาตำแหน่งเมาส์
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
