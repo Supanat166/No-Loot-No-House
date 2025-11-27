@@ -4,6 +4,7 @@ public class Monster : MonoBehaviour
 {
     public GameObject deathEffectPrefab; 
     public HealthBarUI healthBarUI;
+    public SpriteRenderer spriteRenderer;
     public float health = 100f;
     private float maxhealth = 0f;
     public int damage = 15;
@@ -24,6 +25,7 @@ public class Monster : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         monstersAlive++;
         Debug.Log("ซอมบี้เกิด! ตอนนี้มี: " + monstersAlive);
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void FixedUpdate()
@@ -32,6 +34,8 @@ public class Monster : MonoBehaviour
         {
             Vector2 newPos = Vector2.MoveTowards(rb.position, targetBase.transform.position, moveSpeed * Time.fixedDeltaTime);
             rb.MovePosition(newPos);
+
+            spriteRenderer.flipX = newPos.x < 0;
         }
     }
 

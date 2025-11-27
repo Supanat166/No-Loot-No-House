@@ -9439,6 +9439,10 @@ PrefabInstance:
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3133499820994219850, guid: a578376bf5455a748b607de1a2e76feb, type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3133499820994219850, guid: a578376bf5455a748b607de1a2e76feb, type: 3}
       propertyPath: m_SortingOrder
       value: 0
       objectReference: {fileID: 0}
@@ -9652,8 +9656,8 @@ MonoBehaviour:
   baseMovementSpeed: 5
   woodPlanks: 0
   woodCostPerRepair: 5
+  totalAmmo: 0
   weaponHolder: {fileID: 86154549}
-  availableWeapons: []
   currentWeapon: {fileID: 7944290101169939335, guid: 1be207c3c8f39714c8940267135a54d6, type: 3}
   potionCount: 0
   shootSound: {fileID: 8300000, guid: af66162561d2eed40ad49268cab318bb, type: 3}
