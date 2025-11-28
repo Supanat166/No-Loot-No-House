@@ -34,6 +34,7 @@ public class Base : MonoBehaviour
         if (currentHealth > maxHealth) currentHealth = maxHealth;
         
         // [TODO] อัปเดต UI หลอดเลือดบ้าน
+        healthBarUI.slider.value=currentHealth;
         Debug.Log("ซ่อมบ้านแล้ว! HP: " + currentHealth);
     }
 
