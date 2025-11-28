@@ -31,6 +31,7 @@ public class Character : MonoBehaviour
     private AudioSource audioSource; // "ลำโพง" ที่ติดตัวผู้เล่น
     private float currentMovementSpeed;
     private GameObject currentInteractable; // ของที่อยู่ใกล้ๆ (กล่อง/บ้าน)
+    private SpriteRenderer playerSprite;
 
     //==================================================================
     //  UNITY FUNCTIONS (Start, Update)
@@ -39,6 +40,7 @@ public class Character : MonoBehaviour
     void Start()
     {
         currentMovementSpeed = baseMovementSpeed;
+        playerSprite = GetComponent<SpriteRenderer>();
 
         // ดึง "ลำโพง" มาเก็บไว้ (ต้อง Add Component "Audio Source" ที่ Player ก่อน)
         audioSource = GetComponent<AudioSource>();
@@ -65,6 +67,18 @@ public class Character : MonoBehaviour
     {
         float moveX = Input.GetAxis("Horizontal");
         float moveY = Input.GetAxis("Vertical");
+        
+        if (playerSprite != null)
+        {
+            if (moveX > 0) 
+            {
+                playerSprite.flipX = false; 
+            }
+            else if (moveX < 0) 
+            {
+                playerSprite.flipX = true;  
+            }
+        }
 
         Vector2 movement = new Vector2(moveX, moveY).normalized;
         transform.Translate(movement * currentMovementSpeed * Time.deltaTime);
